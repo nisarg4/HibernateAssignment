@@ -75,16 +75,21 @@ public class BankRepository {
 
 	// Delete Method
 	public Result delete(Patron patron) {
+		
+		Session session = factory.getCurrentSession();
 
 		try {
-			PreparedStatement ps = this.con.prepareStatement("DELETE FROM Patron WHERE id=?;");
-			ps.setInt(1, patron.getId());
-
-			if (ps.executeUpdate() == 1)
+				session.beginTransaction();
+				Patron tempPatron = session.get(Patron.class, patron.getId());
+				session.delete(tempPatron);
+				session.getTransaction().commit();
 				return Result.SUCCESS;
 
-		} catch (SQLException e) {
-			System.out.println(e);
+		} catch (NullPointerException e) {
+			System.out.println("No such record found to be deleted!");
+		}
+		finally {
+			session.close();
 		}
 		return Result.FAILURE;
 	}
@@ -183,17 +188,22 @@ public class BankRepository {
 
 	public Result remove(Bank bank) {
 
-		try {
-			PreparedStatement ps = this.con.prepareStatement("DELETE FROM Bank WHERE id=?;");
-			ps.setInt(1, bank.getId());
+		Session session = factory.getCurrentSession();
 
-			if (ps.executeUpdate() == 1)
+		try {
+				session.beginTransaction();
+				Bank tempBank = session.get(Bank.class, bank.getId());
+				session.delete(tempBank);
+				session.getTransaction().commit();
 				return Result.SUCCESS;
 
-		} catch (SQLException e) {
-			System.out.println(e);
+		} catch (NullPointerException e) {
+			System.out.println("No such record found to be deleted!");
 		}
-		return Result.FAILURE;
+		finally {
+			session.close();
+		}
+		return Result.FAILURE; 
 	}
 
 	public Result update(Bank bank) {

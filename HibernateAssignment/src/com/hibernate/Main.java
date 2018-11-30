@@ -29,14 +29,14 @@ public class Main {
 			/*
 			 * 1 - add patron 					-- DONE
 			 * 2 - update patron				-- DONE
-			 * 3 - delete patron
+			 * 3 - delete patron				-- DONE
 			 * 4 - search patron by id 			-- DONE
 			 * 5 - search patron by name		-- DONE
 			 * 6 - add transaction record
 			 * 7 - find transaction by id
 			 * 8 - add bank 					-- DONE
-			 * 9 - remove bank
-			 * 10 - update bank
+			 * 9 - remove bank					-- DONE
+			 * 10 - update bank					-- DONE
 			 * 11 - find bank by id				-- DONE
 			 * 12 - find bank by name			-- DONE
 			 * 13 - add account 			

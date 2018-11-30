@@ -21,7 +21,7 @@ public class Main {
 		Patron p = null;
 		boolean flag = false;
 		while(flag == false) 
-		{
+		{ 
 			printMenu();
 			int choice = sc.nextInt();
 			switch(choice) 
@@ -71,7 +71,7 @@ public class Main {
 				case 3:
 					System.out.println("Enter Patron's id to be deleted: ");
 					id = sc.nextInt();
-					p = new Patron(id,null,null);
+					p = new Patron(id,null,null); 
 					System.out.println(br.delete(p));
 					break;
 					

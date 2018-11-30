@@ -26,6 +26,23 @@ public class Main {
 			int choice = sc.nextInt();
 			switch(choice) 
 			{
+			/*
+			 * 1 - add patron 					-- DONE
+			 * 2 - update patron				-- DONE
+			 * 3 - delete patron
+			 * 4 - search patron by id 			-- DONE
+			 * 5 - search patron by name		-- DONE
+			 * 6 - add transaction record
+			 * 7 - find transaction by id
+			 * 8 - add bank 					-- DONE
+			 * 9 - remove bank
+			 * 10 - update bank
+			 * 11 - find bank by id				-- DONE
+			 * 12 - find bank by name			-- DONE
+			 * 13 - add account 			
+			 * 14 - update account
+			 * 15 - delete account
+			 * 16 - find account details*/
 				case 1:
 					System.out.println("Enter Patron's id: ");
 					id = sc.nextInt();
@@ -64,7 +81,32 @@ public class Main {
 					id = sc.nextInt();
 					System.out.println("Enter Patron's new name: ");
 					String new_name = sc.next();
-					p = new Patron(id,new_name,null);
+					
+					byte[] imag = null;
+					System.out.println("Enter Patron's new image: ");
+					JFileChooser fileChooser1 = new JFileChooser();
+			        int result1 = fileChooser1.showOpenDialog(Main.j);
+			        if(result1 == JFileChooser.APPROVE_OPTION) 
+			        {
+			        	try 
+			        	{
+			        		File file = fileChooser1.getSelectedFile();
+			                BufferedImage image = ImageIO.read(file);
+
+			                //convert image to byte[]
+			                ByteArrayOutputStream output = new ByteArrayOutputStream();
+			                ImageIO.write(image , "png" , output);
+			                imag = output.toByteArray();
+			                p = new Patron(id,new_name,imag);
+			        	}catch(Exception e)
+			            {
+			                e.printStackTrace();
+			                imag = null;
+			            }
+					
+			        }
+					
+					//p = new Patron(id,new_name,imag);
 					System.out.println(br.update(p));
 					break;
 					

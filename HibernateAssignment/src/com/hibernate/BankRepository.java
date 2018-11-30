@@ -28,8 +28,6 @@ public class BankRepository {
 	SessionFactory factory = new Configuration().configure("hibernate.cfg.xml").addAnnotatedClass(Patron.class)
 			.addAnnotatedClass(Bank.class).buildSessionFactory();
 
-	
-
 //create session
 
 	public BankRepository() {
@@ -92,38 +90,45 @@ public class BankRepository {
 	}
 
 	public Result update(Patron patron) {
+
+		Session session = factory.getCurrentSession();
 		try {
-			PreparedStatement ps = this.con.prepareStatement("UPDATE Patron SET name=?, image=? WHERE `id`=?;");
-			ps.setInt(3, patron.getId());
-			ps.setString(1, patron.getName());
-			ps.setBytes(2, patron.getImage());
+			
+			session.beginTransaction();
+			Patron tempPatron = session.get(Patron.class, patron.getId());
+			
+			String name = patron.getName();
 
-			int update = ps.executeUpdate();
-			if (update == 1)
-				return Result.SUCCESS;
+			byte[] image = patron.getImage();
 
-		} catch (SQLException e) {
-			System.out.println(e);
+			tempPatron.setName(name);
+			tempPatron.setImage(image);
+			session.getTransaction().commit();
+			return Result.SUCCESS;
+
+		} catch (NullPointerException e) {
+			System.out.println("No such record found");
+		}finally {
+			session.close();
 		}
 		return Result.FAILURE;
 	}
 
 	public List<Patron> findPatron(String name) {
-		Session session = factory.getCurrentSession();	
+		Session session = factory.getCurrentSession();
 
 		try {
-			session.beginTransaction(); 
+			session.beginTransaction();
 			List<Patron> pList = session.createQuery("from Patron p where p.name =:name").setParameter("name", name)
-			        .getResultList();
-			
+					.getResultList();
+
 			session.getTransaction().commit();
-			
+
 			return pList;
 
 		} catch (Exception e) {
 			System.out.println(e);
-		}
-		finally {
+		} finally {
 			session.close();
 		}
 		return null;
@@ -132,10 +137,10 @@ public class BankRepository {
 	public Patron findPatron(int id) {
 		Session session = factory.getCurrentSession();
 
-		try { 
+		try {
 
 			session.beginTransaction();
-			
+
 			Patron tempPatron = session.get(Patron.class, id);
 
 			session.getTransaction().commit();
@@ -143,10 +148,8 @@ public class BankRepository {
 			return tempPatron;
 
 		} catch (Exception e) {
-			System.out.println(e); 
-		}
-		finally 
-		{
+			System.out.println(e);
+		} finally {
 			session.close();
 		}
 		return null;
@@ -154,7 +157,7 @@ public class BankRepository {
 
 	//// Bank
 	public Result add(Bank bank) {
-		
+
 		Session session = factory.getCurrentSession();
 
 		try {
@@ -194,52 +197,60 @@ public class BankRepository {
 	}
 
 	public Result update(Bank bank) {
+		
+		Session session = factory.getCurrentSession();
 		try {
-			PreparedStatement ps = this.con.prepareStatement("UPDATE Bank SET name=? WHERE id=?;");
-			ps.setInt(2, bank.getId());
-			ps.setString(1, bank.getName());
-
-			int update = ps.executeUpdate();
-			if (update == 1)
+			
+				session.beginTransaction();
+				Bank tempBank = session.get(Bank.class, bank.getId());
+				String name = bank.getName();
+				
+				tempBank.setName(name);
+				
+				session.getTransaction().commit();
+					
 				return Result.SUCCESS;
 
-		} catch (SQLException e) {
-			System.out.println(e);
+		} catch (NullPointerException e) {
+			System.out.println("No such record found");
+		}
+		finally 
+		{
+			session.close(); 
 		}
 		return Result.FAILURE;
 	}
 
 	public Bank findBank(int id) {
-		
+
 		Session session = factory.getCurrentSession();
 
 		try {
 
 			session.beginTransaction();
-			
-			Bank tempBank = session.get(Bank.class,id);
-			
+
+			Bank tempBank = session.get(Bank.class, id);
+
 			session.getTransaction().commit();
 
 			return tempBank;
 
 		} catch (Exception e) {
 			System.out.println(e);
-		}
-		finally 
-		{
+		} finally {
 			session.close();
 		}
 		return null;
 	}
 
 	public List<Bank> findBank(String name) {
-		
+
 		Session session = factory.getCurrentSession();
-		
+
 		try {
-			session.beginTransaction(); 
-			List<Bank> bList = session.createQuery("from Bank b where b.name=:name").setParameter("name", name).getResultList();
+			session.beginTransaction();
+			List<Bank> bList = session.createQuery("from Bank b where b.name=:name").setParameter("name", name)
+					.getResultList();
 			session.getTransaction().commit();
 			return bList;
 

@@ -79,8 +79,11 @@ public class Main {
 					
 					System.out.println("Enter Patron's id to search: ");
 					id = sc.nextInt();
-					Patron pr = br.findPatron(id); 
-					System.out.println(pr.getId()+" "+pr.getName()+" "+pr.getImage());
+					Patron pr = br.findPatron(id);
+					if(pr != null)
+						System.out.println(pr.getId()+" "+pr.getName()+" "+pr.getImage());
+					else
+						System.out.println("Not found");
 					System.out.println("-------------------------------------------------");
 					break;
 					

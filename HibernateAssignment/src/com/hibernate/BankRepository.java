@@ -25,11 +25,12 @@ public class BankRepository {
 
 	private Connection con;
 
-	SessionFactory factory = new Configuration().configure("hibernate.cfg.xml").addAnnotatedClass(Patron.class).addAnnotatedClass(Bank.class)
-			.buildSessionFactory();
+	SessionFactory factory = new Configuration().configure("hibernate.cfg.xml").addAnnotatedClass(Patron.class)
+			.addAnnotatedClass(Bank.class).buildSessionFactory();
+
+	
 
 //create session
-	
 
 	public BankRepository() {
 
@@ -53,7 +54,7 @@ public class BankRepository {
 		try {
 			// create student object
 			Patron tempStudent = new Patron(patron.getId(), patron.getName(), patron.getImage());
-			
+
 			// start a transaction
 			session.beginTransaction();
 
@@ -108,49 +109,52 @@ public class BankRepository {
 	}
 
 	public List<Patron> findPatron(String name) {
-		List<Patron> pList = new ArrayList<>();
+		Session session = factory.getCurrentSession();	
 
 		try {
-
-			PreparedStatement ps = this.con.prepareStatement("SELECT * FROM Patron WHERE name=?");
-			ps.setString(1, name);
-			ResultSet rs = ps.executeQuery();
-			while (rs.next()) {
-				Patron patron = new Patron(rs.getInt(1), rs.getString(2), rs.getBytes(3));
-				pList.add(patron);
-
-			}
+			session.beginTransaction(); 
+			List<Patron> pList = session.createQuery("from Patron p where p.name =:name").setParameter("name", name)
+			        .getResultList();
+			
+			session.getTransaction().commit();
+			
 			return pList;
 
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			System.out.println(e);
 		}
-		return pList;
+		finally {
+			session.close();
+		}
+		return null;
 	}
 
 	public Patron findPatron(int id) {
+		Session session = factory.getCurrentSession();
 
-		try {
+		try { 
 
-			PreparedStatement ps = this.con.prepareStatement("SELECT * FROM Patron WHERE id=?");
-			ps.setInt(1, id);
-			ResultSet rs = ps.executeQuery();
-			rs.next();
-			Blob imageBlob = (Blob) rs.getBlob(3);
-			byte[] imageBytes = imageBlob.getBytes(1, (int) imageBlob.length());
+			session.beginTransaction();
+			
+			Patron tempPatron = session.get(Patron.class, id);
 
-			Patron patron = new Patron(rs.getInt(1), rs.getString(2), imageBytes);
+			session.getTransaction().commit();
 
-			return patron;
+			return tempPatron;
 
-		} catch (SQLException e) {
-			System.out.println(e);
+		} catch (Exception e) {
+			System.out.println(e); 
+		}
+		finally 
+		{
+			session.close();
 		}
 		return null;
 	}
 
 	//// Bank
 	public Result add(Bank bank) {
+		
 		Session session = factory.getCurrentSession();
 
 		try {
@@ -206,42 +210,43 @@ public class BankRepository {
 	}
 
 	public Bank findBank(int id) {
+		
+		Session session = factory.getCurrentSession();
 
 		try {
 
-			PreparedStatement ps = this.con.prepareStatement("SELECT * FROM Bank WHERE id=?");
-			ps.setInt(1, id);
-			ResultSet rs = ps.executeQuery();
-			rs.next();
-			Bank bank = new Bank(rs.getInt(1), rs.getString(2));
+			session.beginTransaction();
+			
+			Bank tempBank = session.get(Bank.class,id);
+			
+			session.getTransaction().commit();
 
-			return bank;
+			return tempBank;
 
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			System.out.println(e);
+		}
+		finally 
+		{
+			session.close();
 		}
 		return null;
 	}
 
 	public List<Bank> findBank(String name) {
-		List<Bank> bList = new ArrayList<>();
-
+		
+		Session session = factory.getCurrentSession();
+		
 		try {
-
-			PreparedStatement ps = this.con.prepareStatement("SELECT * FROM Bank WHERE name=?");
-			ps.setString(1, name);
-			ResultSet rs = ps.executeQuery();
-			while (rs.next()) {
-				Bank bank = new Bank(rs.getInt(1), rs.getString(2));
-				bList.add(bank);
-
-			}
+			session.beginTransaction(); 
+			List<Bank> bList = session.createQuery("from Bank b where b.name=:name").setParameter("name", name).getResultList();
+			session.getTransaction().commit();
 			return bList;
 
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			System.out.println(e);
 		}
-		return bList;
+		return null;
 	}
 
 	// Account

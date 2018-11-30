@@ -18,6 +18,8 @@ public class Patron {
 	
 	@Column(name="image")
 	private byte[] image;
+	
+	public Patron() {}
 	public Patron(int id, String name, byte[] image) {
 		this.id = id;
 		this.name = name;

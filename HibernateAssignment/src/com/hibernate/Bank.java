@@ -16,6 +16,7 @@ private int id;
 @Column(name="name")
 private String name;
 
+public Bank() {}
 
 public Bank(int id, String name) {
 	this.id = id;

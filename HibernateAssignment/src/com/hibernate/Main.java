@@ -42,7 +42,8 @@ public class Main {
 			 * 13 - add account 				-- DONE			
 			 * 14 - update account				-- DONE
 			 * 15 - delete account				-- DONE
-			 * 16 - find account details*/
+			 * 16 - find account details		-- DONE
+			 */		
 				case 1:
 					System.out.println("Enter Patron's id: ");
 					id = sc.nextInt();

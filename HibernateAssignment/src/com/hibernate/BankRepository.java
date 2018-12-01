@@ -347,30 +347,25 @@ public class BankRepository {
 
 	public Account findAccount(int id) {
 
+		Session session = factory.getCurrentSession();
+
 		try {
 
-			PreparedStatement ps = this.con.prepareStatement(
-					"SELECT * FROM Account INNER JOIN Bank ON Account.bank_id=Bank.id where Account.id=?");
-			PreparedStatement ps1 = this.con.prepareStatement(
-					"SELECT * FROM Account INNER JOIN Patron ON Account.patron_id=Patron.id where Account.id=?");
+			session.beginTransaction();
 
-			ps.setInt(1, id);
-			ps1.setInt(1, id);
-			ResultSet rs = ps.executeQuery();
-			ResultSet rs1 = ps1.executeQuery();
-			rs.next();
-			Bank bank = new Bank(rs.getInt(4), rs.getString(5));
-			rs1.next();
-			Patron patron = new Patron(rs1.getInt(4), rs1.getString(5), rs1.getBytes(6));
+			Account tempAccount = session.get(Account.class, id);
 
-			Account account = new Account(rs.getInt(1), bank, patron);
+			session.getTransaction().commit();
 
-			return account;
+			return tempAccount;
 
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			System.out.println(e);
+		} finally {
+			session.close();
 		}
 		return null;
+
 	}
 
 	public Result transact(Transaction transaction) {

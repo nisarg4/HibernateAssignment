@@ -26,7 +26,8 @@ public class BankRepository {
 	private Connection con;
 
 	SessionFactory factory = new Configuration().configure("hibernate.cfg.xml").addAnnotatedClass(Patron.class)
-			.addAnnotatedClass(Bank.class).addAnnotatedClass(Account.class).buildSessionFactory();
+			.addAnnotatedClass(Bank.class).addAnnotatedClass(Account.class).addAnnotatedClass(Transaction.class)
+			.buildSessionFactory();
 
 //create session
 
@@ -370,62 +371,53 @@ public class BankRepository {
 
 	public Result transact(Transaction transaction) {
 
-		try {
-			PreparedStatement ps = this.con
-					.prepareStatement("INSERT INTO Transaction(id,account_id,amount,type) VALUES(?,?,?,?)");
-			ps.setInt(1, transaction.getId());
-			ps.setInt(2, transaction.getAccount().getId());
-			ps.setDouble(3, transaction.getAmount());
-			ps.setString(4, transaction.getAccountType().name());
+		Session session = factory.getCurrentSession();
 
-			ps.executeUpdate();
+		try {
+
+			Account tempAccount = transaction.getAccount();
+			Transaction tempTransaction = new Transaction(transaction.getId(), tempAccount, transaction.getAmount(),
+					transaction.getAccountType());
+
+			session.beginTransaction();
+
+			// save the bank object
+			session.save(tempTransaction);
+
+			// commit transaction
+			session.getTransaction().commit();
 
 			return Result.SUCCESS;
 
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			System.out.println(e);
+			return Result.FAILURE;
+		} finally {
+			session.close();
 		}
-		return Result.FAILURE;
 	}
 
 	public Transaction findTransaction(int id) {
 
+		Session session = factory.getCurrentSession();
+
 		try {
 
-			PreparedStatement psTr = this.con.prepareStatement(
-					"SELECT * FROM Transaction INNER JOIN Account ON Transaction.account_id=Account.id where Transaction.id=?");
-			psTr.setInt(1, id);
-			ResultSet rsTr = psTr.executeQuery();
-			rsTr.next();
-			int bank_id = rsTr.getInt(6);
-			int patron_id = rsTr.getInt(7);
+			session.beginTransaction();
 
-			PreparedStatement psBa = this.con.prepareStatement(
-					"SELECT * FROM Account INNER JOIN Bank ON Account.bank_id=Bank.id where Bank.id=?");
-			psBa.setInt(1, bank_id);
-			ResultSet rsBa = psBa.executeQuery();
-			rsBa.next();
-			Bank bank = new Bank(rsBa.getInt(4), rsBa.getString(5));
+			Transaction tempTransaction = session.get(Transaction.class, id);
 
-			PreparedStatement psPa = this.con.prepareStatement(
-					"SELECT * FROM Account INNER JOIN Patron ON Account.patron_id=Patron.id where Patron.id=?");
-			psPa.setInt(1, patron_id);
-			ResultSet rsPa = psPa.executeQuery();
-			rsPa.next();
-			Patron patron = new Patron(rsPa.getInt(4), rsPa.getString(5), rsPa.getBytes(6));
+			session.getTransaction().commit();
 
-			Account account = new Account(rsTr.getInt(5), bank, patron);
+			return tempTransaction;
 
-			AccountType at = AccountType.valueOf(rsTr.getString(4));
-
-			Transaction tr = new Transaction(id, account, rsTr.getDouble(3), at);
-
-			return tr;
-
-		} catch (SQLException e) {
-			System.out.println(e);
+		} catch (NullPointerException e) {
+			System.out.println("No such transaction found!");
+		} finally {
+			session.close();
 		}
 		return null;
+
 	}
 
 }

@@ -1,5 +1,7 @@
 package com.hibernate;
 
+import java.util.Arrays;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -20,6 +22,10 @@ public class Patron {
 	private byte[] image;
 	
 	public Patron() {}
+	@Override
+	public String toString() {
+		return "Patron [id=" + id + ", name=" + name + ", image=" + Arrays.toString(image) + "]";
+	}
 	public Patron(int id, String name, byte[] image) {
 		this.id = id;
 		this.name = name;

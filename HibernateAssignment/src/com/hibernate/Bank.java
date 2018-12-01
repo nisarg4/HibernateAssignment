@@ -9,6 +9,10 @@ import javax.persistence.Table;
 @Table(name="Bank")
 public class Bank {
 	
+@Override
+	public String toString() {
+		return "Bank [id=" + id + ", name=" + name + "]";
+	}
 @Id
 @Column(name="id")
 private int id;

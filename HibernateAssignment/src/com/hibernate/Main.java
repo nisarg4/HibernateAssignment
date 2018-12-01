@@ -32,7 +32,7 @@ public class Main {
 			 * 3 - delete patron				-- DONE
 			 * 4 - search patron by id 			-- DONE
 			 * 5 - search patron by name		-- DONE
-			 * 6 - add transaction record
+			 * 6 - add transaction record		-- DONE
 			 * 7 - find transaction by id
 			 * 8 - add bank 					-- DONE
 			 * 9 - remove bank					-- DONE
@@ -72,10 +72,7 @@ public class Main {
 			                img = null;
 			            }
 			        }
-					
-			        
-					//System.out.println(br.add(p));
-					//System.out.println(p.getId()+" "+p.getName()+" "+p.getImage());
+
 					break;
 				case 2:
 					System.out.println("Enter Patron's id to be updated: ");
@@ -152,13 +149,13 @@ public class Main {
 					Account account = br.findAccount(acc_id);
 					System.out.println("Enter Amount: ");
 					double amount = sc.nextDouble();
-					System.out.println("Enter type: 1.Debit 2.credit");
+					System.out.println("Enter type: 1.Debit 2.Credit");
 					int type = sc.nextInt();
 					Transaction t = null;
 					if(type == 1)
-						t = new Transaction(id, account, amount,AccountType.DEBIT );
+						t = new Transaction(id, account, amount,AccountType.DEBIT);
 					if(type == 2)
-						t = new Transaction(id, account, amount,AccountType.DEBIT );
+						t = new Transaction(id, account, amount,AccountType.CREDIT);
 					
 					
 					System.out.println(br.transact(t));
@@ -168,7 +165,7 @@ public class Main {
 					System.out.println("Enter Transaction's id to search: ");
 					id = sc.nextInt();
 					Transaction tr = br.findTransaction(id); 
-					System.out.println(tr.getId()+" "+tr.getAccount().getId()+" "+tr.getAmount()+" "+tr.getAccountType().name());
+					System.out.println(tr.getId()+" "+tr.getAccount().getId()+" "+tr.getAccount().getPatron().toString()+" "+tr.getAccount().getBank().toString()+" "+tr.getAmount()+" "+tr.getAccountType().name());
 					System.out.println("-------------------------------------------------");
 					break;
 					

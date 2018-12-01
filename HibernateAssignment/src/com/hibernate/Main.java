@@ -39,9 +39,9 @@ public class Main {
 			 * 10 - update bank					-- DONE
 			 * 11 - find bank by id				-- DONE
 			 * 12 - find bank by name			-- DONE
-			 * 13 - add account 			
-			 * 14 - update account
-			 * 15 - delete account
+			 * 13 - add account 				-- DONE			
+			 * 14 - update account				-- DONE
+			 * 15 - delete account				-- DONE
 			 * 16 - find account details*/
 				case 1:
 					System.out.println("Enter Patron's id: ");

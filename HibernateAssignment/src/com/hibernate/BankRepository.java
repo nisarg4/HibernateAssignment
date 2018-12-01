@@ -26,7 +26,7 @@ public class BankRepository {
 	private Connection con;
 
 	SessionFactory factory = new Configuration().configure("hibernate.cfg.xml").addAnnotatedClass(Patron.class)
-			.addAnnotatedClass(Bank.class).buildSessionFactory();
+			.addAnnotatedClass(Bank.class).addAnnotatedClass(Account.class).buildSessionFactory();
 
 //create session
 
@@ -75,20 +75,19 @@ public class BankRepository {
 
 	// Delete Method
 	public Result delete(Patron patron) {
-		
+
 		Session session = factory.getCurrentSession();
 
 		try {
-				session.beginTransaction();
-				Patron tempPatron = session.get(Patron.class, patron.getId());
-				session.delete(tempPatron);
-				session.getTransaction().commit();
-				return Result.SUCCESS;
+			session.beginTransaction();
+			Patron tempPatron = session.get(Patron.class, patron.getId());
+			session.delete(tempPatron);
+			session.getTransaction().commit();
+			return Result.SUCCESS;
 
 		} catch (NullPointerException e) {
 			System.out.println("No such record found to be deleted!");
-		}
-		finally {
+		} finally {
 			session.close();
 		}
 		return Result.FAILURE;
@@ -98,10 +97,10 @@ public class BankRepository {
 
 		Session session = factory.getCurrentSession();
 		try {
-			
+
 			session.beginTransaction();
 			Patron tempPatron = session.get(Patron.class, patron.getId());
-			
+
 			String name = patron.getName();
 
 			byte[] image = patron.getImage();
@@ -113,7 +112,7 @@ public class BankRepository {
 
 		} catch (NullPointerException e) {
 			System.out.println("No such record found");
-		}finally {
+		} finally {
 			session.close();
 		}
 		return Result.FAILURE;
@@ -191,42 +190,39 @@ public class BankRepository {
 		Session session = factory.getCurrentSession();
 
 		try {
-				session.beginTransaction();
-				Bank tempBank = session.get(Bank.class, bank.getId());
-				session.delete(tempBank);
-				session.getTransaction().commit();
-				return Result.SUCCESS;
+			session.beginTransaction();
+			Bank tempBank = session.get(Bank.class, bank.getId());
+			session.delete(tempBank);
+			session.getTransaction().commit();
+			return Result.SUCCESS;
 
 		} catch (NullPointerException e) {
 			System.out.println("No such record found to be deleted!");
-		}
-		finally {
+		} finally {
 			session.close();
 		}
-		return Result.FAILURE; 
+		return Result.FAILURE;
 	}
 
 	public Result update(Bank bank) {
-		
+
 		Session session = factory.getCurrentSession();
 		try {
-			
-				session.beginTransaction();
-				Bank tempBank = session.get(Bank.class, bank.getId());
-				String name = bank.getName();
-				
-				tempBank.setName(name);
-				
-				session.getTransaction().commit();
-					
-				return Result.SUCCESS;
+
+			session.beginTransaction();
+			Bank tempBank = session.get(Bank.class, bank.getId());
+			String name = bank.getName();
+
+			tempBank.setName(name);
+
+			session.getTransaction().commit();
+
+			return Result.SUCCESS;
 
 		} catch (NullPointerException e) {
 			System.out.println("No such record found");
-		}
-		finally 
-		{
-			session.close(); 
+		} finally {
+			session.close();
 		}
 		return Result.FAILURE;
 	}
@@ -266,6 +262,8 @@ public class BankRepository {
 
 		} catch (Exception e) {
 			System.out.println(e);
+		} finally {
+			session.close();
 		}
 		return null;
 	}
@@ -273,51 +271,78 @@ public class BankRepository {
 	// Account
 	public Result add(Account account) {
 
+		Session session = factory.getCurrentSession();
+
 		try {
-			PreparedStatement ps = this.con.prepareStatement("INSERT INTO Account(id,bank_id,patron_id) VALUES(?,?,?)");
-			ps.setInt(1, account.getId());
-			ps.setInt(2, account.getBank().getId());
-			ps.setInt(3, account.getPatron().getId());
-			ps.executeUpdate();
+
+			Patron tempPatron = account.getPatron();
+			Bank tempBank = account.getBank();
+			if (tempPatron == null || tempBank == null)
+				return Result.FAILURE;
+
+			session.beginTransaction();
+			Account tempAccount = new Account(account.getId(), tempBank, tempPatron);
+
+			session.save(tempAccount);
+
+			session.getTransaction().commit();
 
 			return Result.SUCCESS;
 
-		} catch (SQLException e) {
-			System.out.println(e);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			session.close();
 		}
 		return Result.FAILURE;
 	}
 
 	public Result update(Account account) {
+
+		Session session = factory.getCurrentSession();
 		try {
-			PreparedStatement ps = this.con.prepareStatement("UPDATE Account SET bank_id=?,patron_id=? WHERE id=?;");
-			ps.setInt(1, account.getBank().getId());
-			ps.setInt(2, account.getPatron().getId());
-			ps.setInt(3, account.getId());
 
-			int update = ps.executeUpdate();
-			if (update == 1)
-				return Result.SUCCESS;
+			session.beginTransaction();
+			Patron tempPatron = account.getPatron();
+			Bank tempBank = account.getBank();
+			if (tempPatron == null || tempBank == null)
+				return Result.FAILURE;
 
-		} catch (SQLException e) {
+			Account tempAccount = session.get(Account.class, account.getId());
+
+			tempAccount.setPatron(tempPatron);
+			tempAccount.setBank(tempBank);
+
+			session.getTransaction().commit();
+
+			return Result.SUCCESS;
+
+		} catch (Exception e) {
 			System.out.println(e);
+		} finally {
+			session.close();
 		}
 		return Result.FAILURE;
 	}
 
 	public Result delete(Account account) {
 
+		Session session = factory.getCurrentSession();
 		try {
-			PreparedStatement ps = this.con.prepareStatement("DELETE FROM Account WHERE id=?;");
-			ps.setInt(1, account.getId());
 
-			if (ps.executeUpdate() == 1)
-				return Result.SUCCESS;
+			session.beginTransaction();
+			Account tempAccount = session.get(Account.class, account.getId());
+			session.delete(tempAccount);
+			session.getTransaction().commit();
+			return Result.SUCCESS;
 
-		} catch (SQLException e) {
-			System.out.println(e);
+		} catch (NullPointerException e) {
+			System.out.println("No such record found to be deleted!");
+		} finally {
+			session.close();
 		}
 		return Result.FAILURE;
+
 	}
 
 	public Account findAccount(int id) {

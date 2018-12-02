@@ -253,7 +253,7 @@ public class Main {
 					System.out.println("Enter Account's id to search: ");
 					id = sc.nextInt();
 					account = br.findAccount(id); 
-					System.out.println(account.getId()+" "+account.getBank().getId()+" "+account.getBank().getName()+" "+account.getPatron().getId()+" "+account.getPatron().getName());
+					System.out.println(account.getId()+" "+account.getBank().toString()+" "+account.getPatron().toString());
 					System.out.println("-------------------------------------------------");
 					break;
 				

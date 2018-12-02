@@ -29,24 +29,6 @@ public class BankRepository {
 			.addAnnotatedClass(Bank.class).addAnnotatedClass(Account.class).addAnnotatedClass(Transaction.class)
 			.buildSessionFactory();
 
-//create session
-
-	public BankRepository() {
-
-		// create session factory
-		try {
-			String url = "jdbc:mysql://localhost:3306/JavaDB";
-			String uname = "root";
-			String pass = "password";
-
-			Class.forName("com.mysql.cj.jdbc.Driver");
-			con = DriverManager.getConnection(url, uname, pass);
-		} catch (Exception e) {
-			System.out.println("Error");
-		}
-
-	}
-
 	// Add Method
 	public Result add(Patron patron) {
 		Session session = factory.getCurrentSession();
